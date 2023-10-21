@@ -1,0 +1,41 @@
+---
+title: "AOD from La Izana"
+output: 
+  pdf_document: 
+    fig_height: 8
+---
+
+ 
+```{r}
+rm(list=ls())
+setwd("~/WORKSHOP/AOD/")
+library(lubridate)
+
+
+df <- read.csv("~/Downloads/AOD/AOD15/DAILY/19930101_20231021_Izana.lev15",sep=",",skip=6,header=T)
+
+cnams <- colnames(df)
+# Assuming your date is in dd.mm.yyyy format
+df$date_column <- dmy(df$Date.dd.mm.yyyy.)
+# Assuming your time is in hh:mm:SS format
+df$time_column <- hms(df$Time.hh.mm.ss.)
+# Combine the date and time columns to create POSIX time
+df$posix_time <- as.POSIXct(df$date_column + df$time_column, tz = "UTC")
+
+# Now df$posix_time contains POSIX time values
+
+```
+
+#Plot
+```{r}
+idx <- which(df$AOD_675nm != -999 & df$AOD_440nm != -999)
+last <- df$posix_time[idx[length(idx)]]
+plot(df$posix_time[idx],df$AOD_675nm[idx],xlab="Date",ylab="AOD 675nm",pch=19,cex=0.2,main=paste('Up to ',last))
+plot(df$posix_time[idx],df$AOD_440nm[idx],xlab="Date",ylab="AOD 440nm",pch=19,cex=0.2,main=paste('Up to ',last))
+plot(df$AOD_675nm[idx],df$AOD_440nm[idx],pch=19,cex=0.2,xlab="AOD 675nm",ylab="AOD 440nm",main=paste('Up to ',last))
+abline(c(0,1),col=2,lwd=3)
+```
+
+
+
+ 
